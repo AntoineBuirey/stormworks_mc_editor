@@ -1,0 +1,25 @@
+{
+  "name": "stormworks_mc_editor",
+  "version": "1.0.0",
+  "description": "A project for editing Stormworks creations in Minecraft.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/stormworks_mc_editor.git"
+  },
+  "keywords": [
+    "stormworks",
+    "minecraft",
+    "editor"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.5.0"
+  }
+}
