@@ -35,8 +35,7 @@
   },
   "dependencies": {
     "@types/node": "^25.2.2",
-    "argparse": "^2.0.1",
-    "stormworks_mc_editor": "file:stormworks_mc_editor-1.0.0.tgz"
+    "argparse": "^2.0.1"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.17",

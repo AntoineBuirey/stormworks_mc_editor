@@ -1,4 +1,5 @@
 import { CompilerContext } from './compiler-context';
+import { InputRegistry } from './compiler-context';
 import { BLOCK_IDS } from './sw-mapping';
 import { InputNumber, InputBoolean, OutputBoolean } from '../std/io';
 import { ConstantNumberBlock } from '../std/constants';
@@ -6,57 +7,101 @@ import { ConstantNumberBlock } from '../std/constants';
 export class Compiler {
     public static compile(name: string): string {
         const components = CompilerContext.getInstance().getComponents();
-        
-        let nodesXml = '';
-        let logicXml = '';
+        const ioComponents = components.filter(
+            comp => comp instanceof InputNumber || comp instanceof InputBoolean || comp instanceof OutputBoolean
+        );
+        const logicComponents = components.filter(
+            comp => !(comp instanceof InputNumber || comp instanceof InputBoolean || comp instanceof OutputBoolean)
+        );
 
-        components.forEach((comp) => {
-            const typeId = BLOCK_IDS[comp.typeName as keyof typeof BLOCK_IDS];
+        const buildInputsXml = (inputs?: Record<string, { sourceBlockId: number }>) => {
+            if (!inputs) return '';
+            let xml = '';
+            if (inputs.a) xml += `\n\t\t\t\t\t\t<in1 component_id="${inputs.a.sourceBlockId}"/>`;
+            if (inputs.b) xml += `\n\t\t\t\t\t\t<in2 component_id="${inputs.b.sourceBlockId}"/>`;
+            return xml;
+        };
 
-            // 1. GESTION DES NODES (I/O Extérieurs)
-            if (comp instanceof InputNumber || comp instanceof InputBoolean || comp instanceof OutputBoolean) {
-                const type = comp.typeName.includes('number') ? '1' : '0'; // 0=Bool, 1=Number
-                const mode = comp instanceof OutputBoolean ? '1' : '0';    // 0=Input, 1=Output
-                
-                nodesXml += `
-        <n id="${comp.id}" name="${(comp as any).name}" type="${type}" mode="${mode}">
-            <p x="${comp.position.x}" y="${comp.position.y}"/>
-        </n>`;
-            } 
-            
-            // 2. GESTION DE LA LOGIQUE INTERNE
-            else {
-                logicXml += `
-        <c id="${comp.id}" type="${typeId}">
-            <p x="${comp.position.x}" y="${comp.position.y}"/>`;
-
-                // Gestion des constantes
-                if (comp instanceof ConstantNumberBlock) {
-                    logicXml += `\n            <v v="${comp.value}"/>`;
-                }
-
-                // Gestion des entrées (Wiring)
-                // On inspecte dynamiquement les propriétés qui sont des Signaux
-                Object.keys(comp).forEach(key => {
-                    const val = (comp as any)[key];
-                    if (val && val.sourceBlockId !== undefined) {
-                        // Stormworks utilise <i index="0" component_id="ID"/> pour les entrées
-                        // L'index dépend du bloc (ex: GreaterThan: 0=A, 1=B)
-                        const inputIndex = key === 'a' ? 0 : 1; 
-                        logicXml += `\n            <i index="${inputIndex}" component_id="${val.sourceBlockId}"/>`;
-                    }
-                });
-
-                logicXml += `\n        </c>`;
+        const nodeXml = ioComponents.map((comp, index) => {
+            const nodeId = index + 1;
+            const label = (comp as any).name ?? '';
+            if (comp instanceof OutputBoolean) {
+                return `\n\t\t<n id="${nodeId}" component_id="${comp.id}">\n\t\t\t<node label="${label}">\n\t\t\t\t<position z="1"/>\n\t\t\t</node>\n\t\t</n>`;
             }
-        });
+
+            const nodeTypeAttr = comp instanceof InputNumber ? ' type="1"' : '';
+            return `\n\t\t<n id="${nodeId}" component_id="${comp.id}">\n\t\t\t<node label="${label}" mode="1"${nodeTypeAttr}>\n\t\t\t\t<position x="${comp.position.x}"/>\n\t\t\t</node>\n\t\t</n>`;
+        }).join('');
+
+        const componentsXml = logicComponents.map(comp => {
+            const typeId = BLOCK_IDS[comp.typeName as keyof typeof BLOCK_IDS];
+            const inputs = InputRegistry.getInputs(comp.id);
+            const inputsXml = buildInputsXml(inputs);
+            const constantXml = comp instanceof ConstantNumberBlock
+                ? `\n\t\t\t\t\t\t<n text="${comp.value}" value="${comp.value}"/>`
+                : '';
+
+            return `\n\t\t\t<c type="${typeId}">\n\t\t\t\t<object id="${comp.id}">\n\t\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${constantXml}${inputsXml}\n\t\t\t\t</object>\n\t\t\t</c>`;
+        }).join('');
+
+        const componentsBridgeXml = ioComponents.map(comp => {
+            if (comp instanceof InputNumber) {
+                return `\n\t\t\t<c type="2">\n\t\t\t\t<object id="${comp.id}">\n\t\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>\n\t\t\t\t</object>\n\t\t\t</c>`;
+            }
+            if (comp instanceof InputBoolean) {
+                return `\n\t\t\t<c>\n\t\t\t\t<object id="${comp.id}"/>\n\t\t\t</c>`;
+            }
+
+            const inputSource = (comp as OutputBoolean).inputSource;
+            const in1 = inputSource ? `\n\t\t\t\t\t<in1 component_id="${inputSource.sourceBlockId}"/>` : '';
+            return `\n\t\t\t<c type="1">\n\t\t\t\t<object id="${comp.id}">\n\t\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${in1}\n\t\t\t\t</object>\n\t\t\t</c>`;
+        }).join('');
+
+        const componentStatesXml = logicComponents.map((comp, index) => {
+            const inputs = InputRegistry.getInputs(comp.id);
+            const inputsXml = buildInputsXml(inputs);
+            const constantXml = comp instanceof ConstantNumberBlock
+                ? `\n\t\t\t\t<n text="${comp.value}" value="${comp.value}"/>`
+                : '';
+            return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${constantXml}${inputsXml}\n\t\t\t</c${index}>`;
+        }).join('');
+
+        const componentBridgeStatesXml = ioComponents.map((comp, index) => {
+            if (comp instanceof InputNumber) {
+                return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>\n\t\t\t</c${index}>`;
+            }
+            if (comp instanceof InputBoolean) {
+                return `\n\t\t\t<c${index} id="${comp.id}"/>`;
+            }
+
+            const inputSource = (comp as OutputBoolean).inputSource;
+            const in1 = inputSource ? `\n\t\t\t\t<in1 component_id="${inputSource.sourceBlockId}"/>` : '';
+            return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${in1}\n\t\t\t</c${index}>`;
+        }).join('');
+
+        const maxComponentId = components.reduce((max, comp) => Math.max(max, comp.id), 0);
+        const maxNodeId = ioComponents.length;
 
         return `<?xml version="1.0" encoding="UTF-8"?>
-<microprocessor name="${name}" description="Generated by TypeScript Compiler" width="2" height="2">
-    <nodes>${nodesXml}
-    </nodes>
-    <components>${logicXml}
-    </components>
+<microprocessor name="${name}" description="Generated by TypeScript Compiler" width="2" length="2" id_counter="${maxComponentId}" id_counter_node="${maxNodeId}">
+	<nodes>${nodeXml}
+	</nodes>
+	<group>
+		<data>
+			<inputs/>
+			<outputs/>
+		</data>
+		<components>${componentsXml}
+		</components>
+		<components_bridge>${componentsBridgeXml}
+		</components_bridge>
+		<groups/>
+		<component_states>${componentStatesXml}
+		</component_states>
+		<component_bridge_states>${componentBridgeStatesXml}
+		</component_bridge_states>
+		<group_states/>
+	</group>
 </microprocessor>`;
     }
 }

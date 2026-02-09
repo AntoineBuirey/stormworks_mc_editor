@@ -24,6 +24,7 @@ export abstract class Component {
 
     constructor(public readonly typeName: string) {
         this.id = Component.idCounter++;
+        // Registration is immediate, but properties might not be set yet
         CompilerContext.register(this);
     }
 }

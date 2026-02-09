@@ -5,11 +5,13 @@ import ts from "typescript";
 import fs from "fs";
 import path from "path";
 
-const parser = new ArgumentParser({ description: 'Process some integers.' })
+const parser = new ArgumentParser({ description: 'Stormworks MC Compiler' })
 parser.add_argument('file', { help: 'the .ts file to process' })
+parser.add_argument('output', { help: 'the output XML file' })
 
 const args = parser.parse_args()
 const inputFile = path.resolve(args.file);
+const outputFile = path.resolve(args.output);
 const baseDir = path.dirname(inputFile);
 const temp_dir = path.join(baseDir, ".stormworks_mc_editor_temp");
 
@@ -26,13 +28,6 @@ function findPackageRoot(startDir: string): string | null {
     }
 }
 
-
-/**
- * Compiles the given TypeScript file to JavaScript and outputs it to a temporary directory.
- * @param inputFile The path to the TypeScript file to compile.
- * @returns The path to the compiled JavaScript file.
- * @throws If the compilation fails, an error is thrown with the compilation diagnostics.
- */
 function compile(inputFile: string) : string {
     const source = fs.readFileSync(inputFile, "utf8");
     const result = ts.transpileModule(source, {
@@ -45,7 +40,7 @@ function compile(inputFile: string) : string {
         }
     });
 
-    const diagnostics = result.diagnostics ?? [];
+    const diagnostics = result.diagnostics ??[];
     diagnostics.forEach(diagnostic => {
         if (diagnostic.file) {
             const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start ?? 0);
@@ -60,10 +55,10 @@ function compile(inputFile: string) : string {
         throw new Error("TypeScript compilation failed");
     }
 
-    const outputFile = path.join(temp_dir, path.basename(inputFile).replace(".ts", ".js"));
-    fs.writeFileSync(outputFile, result.outputText, "utf8");
-    console.log(`Compiled ${inputFile} to ${outputFile}`);
-    return outputFile;
+    const outputJsFile = path.join(temp_dir, path.basename(inputFile).replace(".ts", ".js"));
+    fs.writeFileSync(outputJsFile, result.outputText, "utf8");
+    console.log(`Compiled ${inputFile} to ${outputJsFile}`);
+    return outputJsFile;
 }
 
 function loadModule(filePath: string) {
@@ -77,26 +72,23 @@ function loadModule(filePath: string) {
         }
         const { Compiler } = require(compilerPath);
         const loaded = require(filePath);
-        // get the exported class from the loaded module (assuming it exports a single class that extends MicroController)
         const controller_name = Object.keys(loaded)[0];
         const controller = loaded[controller_name];
         new controller();
-        setTimeout(() => {
-            console.log("Module loaded:", controller_name);
+        setImmediate(() => {
+            console.log(`Module loaded: ${controller_name}`);
             const xml = Compiler.compile(controller_name);
-            console.log(xml);
-        }, 0);
+            fs.writeFileSync(outputFile, xml, "utf8");
+            console.log(`Generated ${outputFile}`);
+        });
     } catch (err) {
         console.error("Error loading module:", err);
     }
 }
 
-
 function cleanup() {
-    // delete the temporary directory and its contents
     if (fs.existsSync(temp_dir)) {
         fs.rmSync(temp_dir, { recursive: true, force: true });
-        console.log(`Cleaned up temporary directory: ${temp_dir}`);
     }
 }
 
@@ -104,7 +96,6 @@ function cleanup() {
 if (!fs.existsSync(temp_dir)) {
     fs.mkdirSync(temp_dir, { recursive: true });
 }
-
 
 try {    
     const compiledFile = compile(inputFile);

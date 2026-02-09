@@ -1,4 +1,18 @@
 import { Component } from './types';
+import { Signal, NodeType } from './types';
+
+// Store component inputs separately to work around TypeScript constructor limitation
+export class InputRegistry {
+    private static inputs = new Map<number, Record<string, Signal<NodeType>>>();
+    
+    public static setInputs(componentId: number, inputs: Record<string, Signal<NodeType>>) {
+        this.inputs.set(componentId, inputs);
+    }
+    
+    public static getInputs(componentId: number): Record<string, Signal<NodeType>> | undefined {
+        return this.inputs.get(componentId);
+    }
+}
 
 export class CompilerContext {
     private static instance: CompilerContext;

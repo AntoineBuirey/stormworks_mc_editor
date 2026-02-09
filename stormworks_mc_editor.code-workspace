@@ -11,6 +11,9 @@
                 "envManager": "ms-python.python:system",
                 "packageManager": "ms-python.python:pip"
             }
-        ]
+        ],
+        "chat.tools.terminal.autoApprove": {
+            "npx stormworks-mc-editor": true
+        }
     }
 }
