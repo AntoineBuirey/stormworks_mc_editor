@@ -1,10 +1,11 @@
-import { Compiler } from "./compiler";
-
-
 // user-defined microcontroller must extend this class
 // only one instance of this class should be created in the entire codebase, as it represents the microcontroller to be compiled
 export abstract class MicroController {
     static instance: MicroController;
+
+    public name: string = "UnnamedController";
+    public description: string = "No description provided.";
+
     constructor() {
         if (MicroController.instance) {
             throw new Error("Only one instance of MicroController is allowed.");
@@ -17,8 +18,6 @@ export abstract class MicroController {
             // first, run the method defined by the user to set up the controller's components and logic
             this.setup();
             //then, register this instance in the compiler context so it can be compiled later
-            const xml = Compiler.compile(this.constructor.name);
-            console.log(xml);
         }, 0);
     }
 

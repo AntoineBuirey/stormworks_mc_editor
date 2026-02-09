@@ -2,14 +2,23 @@
   "name": "stormworks_mc_editor",
   "version": "1.0.0",
   "description": "A project for editing Stormworks creations in Minecraft.",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "start": "node dist/test.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/stormworks_mc_editor.git"
+    "url": "https://github.com/antoinebuirey/stormworks_mc_editor.git"
   },
   "keywords": [
     "stormworks",
@@ -18,8 +27,19 @@
   ],
   "author": "Your Name",
   "license": "MIT",
-  "dependencies": {},
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "stormworks-mc-editor": "dist/cli.js"
+  },
+  "dependencies": {
+    "@types/node": "^25.2.2",
+    "argparse": "^2.0.1",
+    "stormworks_mc_editor": "file:stormworks_mc_editor-1.0.0.tgz"
+  },
   "devDependencies": {
+    "@types/argparse": "^2.0.17",
     "typescript": "^4.5.0"
   }
 }
