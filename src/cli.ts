@@ -5,6 +5,8 @@ import ts from "typescript";
 import fs from "fs";
 import path from "path";
 
+import { Compiler } from "./core/compiler";
+
 const parser = new ArgumentParser({ description: 'Stormworks MC Compiler' })
 parser.add_argument('file', { help: 'the .ts file to process' })
 parser.add_argument('output', { help: 'the output XML file' })
@@ -63,21 +65,14 @@ function compile(inputFile: string) : string {
 
 function loadModule(filePath: string) {
     try {
-        const packageRoot = findPackageRoot(baseDir);
-        const compilerPath = packageRoot
-            ? path.join(packageRoot, "dist", "core", "compiler.js")
-            : null;
-        if (!compilerPath || !fs.existsSync(compilerPath)) {
-            throw new Error("Compiler not found. Run 'npm run build' in the project root.");
-        }
-        const { Compiler } = require(compilerPath);
         const loaded = require(filePath);
         const controller_name = Object.keys(loaded)[0];
-        const controller = loaded[controller_name];
-        new controller();
+        const controller = new loaded[controller_name]();
+        const description = controller.description;
+        const size = controller.size;
         setImmediate(() => {
             console.log(`Module loaded: ${controller_name}`);
-            const xml = Compiler.compile(controller_name);
+            const xml = new Compiler(controller_name, description, size).compile();
             fs.writeFileSync(outputFile, xml, "utf8");
             console.log(`Generated ${outputFile}`);
         });

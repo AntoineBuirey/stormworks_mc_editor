@@ -1,10 +1,10 @@
 // user-defined microcontroller must extend this class
 // only one instance of this class should be created in the entire codebase, as it represents the microcontroller to be compiled
 export abstract class MicroController {
-    static instance: MicroController;
+    private static instance: MicroController;
 
-    public name: string = "UnnamedController";
     public description: string = "No description provided.";
+    size: { width: number, height: number } = { width: 2, height: 2 }; // default size, can be overridden by user
 
     constructor() {
         if (MicroController.instance) {

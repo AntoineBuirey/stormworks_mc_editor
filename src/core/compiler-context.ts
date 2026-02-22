@@ -1,4 +1,4 @@
-import { Component } from './types';
+import { Component } from './component';
 import { Signal, NodeType } from './types';
 
 // Store component inputs separately to work around TypeScript constructor limitation

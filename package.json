@@ -34,11 +34,11 @@
     "stormworks-mc-editor": "dist/cli.js"
   },
   "dependencies": {
-    "@types/node": "^25.2.2",
     "argparse": "^2.0.1"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.17",
+    "@types/node": "^25.2.2",
     "typescript": "^4.5.0"
   }
 }

@@ -1,9 +1,6 @@
-export const BLOCK_IDS = {
-    // Nodes (handled separately)
-    'input_number': 0,
-    'input_bool': 0,
-    'output_bool': 0,
-    
+import { NodeType, NodeMode } from "./types";
+
+export const BLOCK_IDS = {   
     // Arithmetic components
     'math_abs': 14,
     'math_add': 6,
@@ -72,4 +69,41 @@ export const BLOCK_IDS = {
     'property_toggle': 33,
     'property_tooltip_number': 43,
     'property_tooltip_bool': 44,
+};
+
+export const NODE_TYPES : Record<NodeType, number> = {
+    'Boolean': 0,
+    'Number': 1,
+    'Composite': 5,
+    'Audio': 6,
+    'Video': 7
+};
+
+export const NODE_MODES : Record<NodeMode, number> = {
+    'Output': 0,
+    'Input': 1
+};
+
+
+export const NODE_IDS : Record<NodeType, Record<NodeMode, number>> = {
+    'Boolean': {
+        'Input': 0,
+        'Output': 1
+    },
+    'Number': {
+        'Input': 2,
+        'Output': 3
+    },
+    'Composite': {
+        'Input': 4,
+        'Output': 5
+    },
+    'Video': {
+        'Input': 6,
+        'Output': 7
+    },
+    'Audio': {
+        'Input': 8,
+        'Output': 9
+    }
 };
