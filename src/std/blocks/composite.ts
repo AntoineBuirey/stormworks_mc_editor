@@ -158,7 +158,7 @@ export class LuaScriptBlock extends Component {
     public readonly video: VideoSignal;
 
     constructor(public readonly dataInput: CompositeSignal, public readonly videoInput: VideoSignal, public readonly fileScriptPath: string) {
-        super('lua_script');
+        super('composite_lua');
 
         if (!fs.existsSync(fileScriptPath)) {
             throw new Error(`Lua script file not found at path: ${fileScriptPath}`);
