@@ -11,7 +11,7 @@ export class AudioSwitchboxBlock extends Component {
     public readonly output: AudioSignal;
 
     constructor(public readonly onInput: AudioSignal, public readonly offInput: AudioSignal, public readonly switchSignal: BoolSignal) {
-        super('audio_switchbox');
+        super('composite_audio_switchbox');
         InputRegistry.setInputs(this.id, { onInput, offInput, switchSignal });
         this.output = new AudioSignal(this.id);
     }
@@ -62,7 +62,7 @@ export class CompositeReadOnOffBlock extends Component {
     constructor( input: CompositeSignal, channel: number);
     constructor(input: CompositeSignal, channel: 'variable', startChannel: NumberSignal);
     constructor(public readonly input: CompositeSignal, public readonly channel: number | 'variable', public readonly startChannel?: NumberSignal) {
-        super('composite_read_onoff');
+        super('composite_read_bool');
         if (typeof channel === 'number') {
             InputRegistry.setInputs(this.id, { input });
             this.attributes.i = channel;
@@ -133,7 +133,7 @@ export class CompositeWriteOnOffBlock extends Component {
     constructor(input: CompositeSignal, channelCount: number, startChannel: number, startChannelSignal?: undefined, ...values: BoolSignal[]);
     constructor(input: CompositeSignal, channelCount: number, startChannel: 'variable', startChannelSignal: NumberSignal, ...values: BoolSignal[]);
     constructor(public readonly input: CompositeSignal, public readonly channelCount: number, public readonly startChannel: 'variable' | number, public readonly startChannelSignal?: NumberSignal, ... values: BoolSignal[]) {
-        super('composite_write_onoff');
+        super('composite_write_bool');
         const inputsObject: Record<string, any> = { input };
         values.forEach((value, index) => {
             inputsObject[`value${index}`] = value;
@@ -177,7 +177,7 @@ export class NumberToCompositeBinaryBlock extends Component {
     public readonly output: CompositeSignal;
     
     constructor(public readonly input: NumberSignal) {
-        super('number_to_composite_binary');
+        super('composite_number_to_binary');
         InputRegistry.setInputs(this.id, { input });
         this.output = new CompositeSignal(this.id);
     }
@@ -190,7 +190,7 @@ export class VideoSwitchboxBlock extends Component {
     public readonly output: VideoSignal;
 
     constructor(public readonly onInput: VideoSignal, public readonly offInput: VideoSignal, public readonly switchSignal: BoolSignal) {
-        super('video_switchbox');
+        super('composite_video_switchbox');
         InputRegistry.setInputs(this.id, { onInput, offInput, switchSignal });
         this.output = new VideoSignal(this.id);
     }

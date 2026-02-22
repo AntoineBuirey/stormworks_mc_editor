@@ -1,5 +1,5 @@
 import { Component } from '../../core/component';
-import { NumberSignal, BoolSignal } from '../../core/types';
+import { NumberSignal, BoolSignal, NumberSignalOrUndef, BoolSignalOrUndef } from '../../core/types';
 import { InputRegistry } from '../../core/compiler-context';
 
 /**
@@ -106,10 +106,10 @@ export class TooltipNumberBlock extends Component {
     constructor(
         public readonly name: string,
         public readonly display: 'Always' | 'If Error' | 'if No Error',
-        public readonly value: NumberSignal,
-        public readonly error: BoolSignal
+        public readonly value: NumberSignalOrUndef,
+        public readonly error: BoolSignalOrUndef
     ) {
-        super('tooltip_number');
+        super('property_tooltip_number');
         this.attributes.l = name;
         this.attributes.m = this.displayModeMap[display];
         InputRegistry.setInputs(this.id, { value, error });
@@ -132,9 +132,9 @@ export class TooltipOnOffBlock extends Component {
         public readonly onLabel: string,
         public readonly offLabel: string,
         public readonly display: 'Always' | 'If On' | 'if Off',
-        public readonly value: BoolSignal,
+        public readonly value: BoolSignalOrUndef,
     ) {
-        super('tooltip_onoff');
+        super('property_tooltip_bool');
         this.attributes.l = name;
         this.attributes.on = onLabel;
         this.attributes.off = offLabel;

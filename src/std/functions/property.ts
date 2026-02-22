@@ -20,8 +20,8 @@ export function PropertyText(name: string, value: string) {
 export function TooltipNumber(
     name: string,
     display: 'Always' | 'If Error' | 'if No Error',
-    value: NumberSignal,
-    error: BoolSignal
+    value?: NumberSignal,
+    error?: BoolSignal
 ) {
     new blocks.TooltipNumberBlock(name, display, value, error);
 }
@@ -31,7 +31,7 @@ export function TooltipOnOff(
     onLabel: string,
     offLabel: string,
     display: 'Always' | 'If On' | 'if Off',
-    value: BoolSignal
+    value?: BoolSignal
 ) {
     new blocks.TooltipOnOffBlock(name, onLabel, offLabel, display, value);
 }

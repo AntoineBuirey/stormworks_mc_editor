@@ -111,10 +111,10 @@ export class Compiler {
         this.name = name;
         this.description = description;
         this.size = size;
-        const components = CompilerContext.getInstance().getComponents();
-        this.nbComponents = components.length;
-        this.nodeComponents = components.filter(comp => comp instanceof NodeComponent) as NodeComponent[];
-        this.logicComponents = components.filter(comp => !(comp instanceof NodeComponent));
+        const context = CompilerContext.getInstance();
+        this.nbComponents = context.getNbComponents();
+        this.nodeComponents = context.getNodeComponents();
+        this.logicComponents = context.getLogicComponents();
     }
 
     public compile(): string {
@@ -185,6 +185,7 @@ export class Compiler {
         const inputs = InputRegistry.getInputs(component.id);
         let inputIndex = 1;
         for (const [inputName, signal] of Object.entries(inputs || {})) {
+            if (!signal) continue;
             properties += `\n<in${inputIndex++} component_id="${signal.sourceBlockId}"/>`;
         }
         return formatString(XML_COMPONENT_BASE, {
@@ -219,6 +220,7 @@ export class Compiler {
         let properties = "";
         let inputIndex = 1;
         for (const [inputName, signal] of Object.entries(inputs || {})) {
+            if (!signal) continue;
             properties += `\n<in${inputIndex++} component_id="${signal.sourceBlockId}"/>`;
         }
         return formatString(XML_COMPONENT_BRIDGE_BASE, {
@@ -254,6 +256,7 @@ export class Compiler {
         const inputs = InputRegistry.getInputs(component.id);
         let inputIndex = 1;
         for (const [inputName, signal] of Object.entries(inputs || {})) {
+            if (!signal) continue;
             properties += `\n<in${inputIndex++} component_id="${signal.sourceBlockId}"/>`;
         }
         
@@ -285,6 +288,7 @@ export class Compiler {
         const inputs = InputRegistry.getInputs(component.id);
         let inputIndex = 1;
         for (const [inputName, signal] of Object.entries(inputs || {})) {
+            if (!signal) continue;
             properties += `\n<in${inputIndex++} component_id="${signal.sourceBlockId}"/>`;
         }
         return formatString(XML_COMPONENT_BRIDGE_STATE_BASE, {
@@ -311,33 +315,3 @@ export class Compiler {
     }
 }
 
-
-// const componentStatesXml = logicComponents.map((comp, index) => {
-//     const inputs = InputRegistry.getInputs(comp.id);
-//     const inputsXml = buildInputsXml(inputs);
-//     const constantXml = comp instanceof ConstantNumberBlock
-//         ? `\n\t\t\t\t<n text="${comp.value}" value="${comp.value}"/>`
-//         : '';
-//     return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${constantXml}${inputsXml}\n\t\t\t</c${index}>`;
-// }).join('');
-
-// const componentBridgeStatesXml = ioComponents.map((comp, index) => {
-//     if (comp instanceof InputNumber) {
-//         return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>\n\t\t\t</c${index}>`;
-//     }
-//     if (comp instanceof InputBoolean) {
-//         return `\n\t\t\t<c${index} id="${comp.id}"/>`;
-//     }
-
-//     const inputSource = (comp as OutputBoolean).inputSource;
-//     const in1 = inputSource ? `\n\t\t\t\t<in1 component_id="${inputSource.sourceBlockId}"/>` : '';
-//     return `\n\t\t\t<c${index} id="${comp.id}">\n\t\t\t\t<pos x="${comp.position.x}" y="${comp.position.y}"/>${in1}\n\t\t\t</c${index}>`;
-// }).join('');
-
-// const buildInputsXml = (inputs?: Record<string, { sourceBlockId: number }>) => {
-//     if (!inputs) return '';
-//     let xml = '';
-//     if (inputs.a) xml += `\n\t\t\t\t\t\t<in1 component_id="${inputs.a.sourceBlockId}"/>`;
-//     if (inputs.b) xml += `\n\t\t\t\t\t\t<in2 component_id="${inputs.b.sourceBlockId}"/>`;
-//     return xml;
-// };

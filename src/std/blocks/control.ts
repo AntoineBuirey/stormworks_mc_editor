@@ -10,7 +10,7 @@ export class BlinkerBlock extends Component {
     public readonly output: BoolSignal;
     
     constructor(public readonly control: BoolSignal, onDuration: number, offDuration: number) {
-        super('blinker');
+        super('control_blinker');
         this.attributes.on = onDuration;
         this.attributes.off = offDuration;
         InputRegistry.setInputs(this.id, { control });
@@ -25,7 +25,7 @@ export class CapacitorBlock extends Component {
     public readonly output: NumberSignal;
     
     constructor(public readonly charge: BoolSignal, public readonly chargeTime: number, public readonly dischargeTime: number) {
-        super('capacitor');
+        super('control_capacitor');
         this.attributes.ct = chargeTime;
         this.attributes.dt = dischargeTime;
         InputRegistry.setInputs(this.id, { charge });
@@ -71,7 +71,7 @@ export class MemoryRegisterBlock extends Component {
         public readonly numberToStore: NumberSignal,
         public readonly resetValue: number
     ) {
-        super('memory_register');
+        super('control_memory');
         InputRegistry.setInputs(this.id, { set, reset, numberToStore });
         this.properties.r = resetValue;
         this.output = new NumberSignal(this.id);
@@ -86,7 +86,7 @@ export class NumericalJunctionBlock extends Component {
     public readonly offpath: NumberSignal;
     
     constructor(public readonly value: NumberSignal, public readonly switchSignal: BoolSignal) {
-        super('numerical_junction');
+        super('control_num_junction');
         InputRegistry.setInputs(this.id, { value, switchSignal });
         this.onpath = new NumberSignal(this.id);
         this.offpath = new NumberSignal(this.id);
@@ -100,7 +100,7 @@ export class NumericalSwitchBoxBlock extends Component {
     public readonly output: NumberSignal;
     
     constructor(public readonly onValue: NumberSignal, public readonly offValue: NumberSignal, public readonly switchSignal: BoolSignal) {
-        super('numerical_switch_box');
+        super('control_num_switchbox');
         InputRegistry.setInputs(this.id, { onValue, offValue, switchSignal });
         this.output = new NumberSignal(this.id);
     }
@@ -120,7 +120,7 @@ export class PIDControllerBlock extends Component {
         public readonly integral: number,
         public readonly derivative: number
     ) {
-        super('pid_controller');
+        super('control_pid');
         InputRegistry.setInputs(this.id, { setpoint, processVariable, active });
         this.properties.kp = proportional;
         this.properties.ki = integral;
@@ -143,7 +143,7 @@ export class PIDControllerAdvancedBlock extends Component {
         public readonly derivative: NumberSignal,
         public readonly active: BoolSignal
     ) {
-        super('pid_controller_advanced');
+        super('control_pid_advanced');
         InputRegistry.setInputs(this.id, { setpoint, processVariable, proportional, integral, derivative, active });
         this.output = new NumberSignal(this.id);
     }
@@ -156,7 +156,7 @@ export class ThresholdBlock extends Component {
     public readonly output: BoolSignal;
     
     constructor(public readonly value: NumberSignal, public readonly low: number, public readonly high: number) {
-        super('threshold');
+        super('control_threshold');
         this.properties.min = low;
         this.properties.max = high;
         InputRegistry.setInputs(this.id, { value });
@@ -176,7 +176,7 @@ export class TimerRTFBlock extends Component {
         public readonly reset: BoolSignal,
         public readonly unit: 'ticks' | 'seconds'
     ) {
-        super('timer_rtf');
+        super('control_timer_rtf');
         InputRegistry.setInputs(this.id, { enabled, duration, reset });
         this.attributes.u = unit;
         this.timing = new BoolSignal(this.id);
@@ -195,7 +195,7 @@ export class TimerRTOBlock extends Component {
         public readonly reset: BoolSignal,
         public readonly unit: 'ticks' | 'seconds'
     ) {
-        super('timer_rto');
+        super('control_timer_rto');
         InputRegistry.setInputs(this.id, { enabled, duration, reset });
         this.attributes.u = unit;
         this.complete = new BoolSignal(this.id);
@@ -213,7 +213,7 @@ export class TimerTOFBlock extends Component {
         public readonly duration: NumberSignal,
         public readonly unit: 'ticks' | 'seconds'
     ) {
-        super('timer_tof');
+        super('control_timer_tof');
         InputRegistry.setInputs(this.id, { enabled, duration });
         this.attributes.u = unit;
         this.timing = new BoolSignal(this.id);
@@ -231,7 +231,7 @@ export class TimerTONBlock extends Component {
         public readonly duration: NumberSignal,
         public readonly unit: 'ticks' | 'seconds'
     ) {
-        super('timer_ton');
+        super('control_timer_ton');
         InputRegistry.setInputs(this.id, { enabled, duration });
         this.attributes.u = unit;
         this.complete = new BoolSignal(this.id);
@@ -254,7 +254,7 @@ export class UpDownCounterBlock extends Component {
         public readonly minValue: number,
         public readonly maxValue: number
     ) {
-        super('up_down_counter');
+        super('control_counter');
         InputRegistry.setInputs(this.id, { up, down, reset });
         this.properties.i = increment;
         this.properties.r = resetValue;

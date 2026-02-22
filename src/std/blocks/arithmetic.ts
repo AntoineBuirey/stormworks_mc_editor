@@ -1,5 +1,5 @@
 import { Component } from '../../core/component';
-import { NumberSignal, BoolSignal } from '../../core/types';
+import { NumberSignal, BoolSignal, NumberSignalOrUndef, BoolSignalOrUndef } from '../../core/types';
 import { InputRegistry } from '../../core/compiler-context';
 
 
@@ -9,7 +9,7 @@ import { InputRegistry } from '../../core/compiler-context';
 export class AbsBlock extends Component {
     public readonly output: NumberSignal;
     
-    constructor(public readonly input: NumberSignal) {
+    constructor(public readonly input: NumberSignalOrUndef) {
         super('math_abs');
         InputRegistry.setInputs(this.id, { input });
         this.output = new NumberSignal(this.id); // Output signal from this block
@@ -22,7 +22,7 @@ export class AbsBlock extends Component {
 export class AddBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef) {
         super('math_add');
         InputRegistry.setInputs(this.id, { a, b });
         this.output = new NumberSignal(this.id); // Output signal from this block
@@ -36,7 +36,7 @@ export class AddBlock extends Component {
 export class ClampBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly value: NumberSignal, min: number, max: number) {
+    constructor(public readonly value: NumberSignalOrUndef, min: number, max: number) {
         super('math_clamp');
         InputRegistry.setInputs(this.id, { value });
         this.properties.min = min; //will be translated to <min text="0" value="0"/> (if min is 0)
@@ -64,7 +64,7 @@ export class ConstantNumberBlock extends Component {
 export class DeltaBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly input: NumberSignal) {
+    constructor(public readonly input: NumberSignalOrUndef) {
         super('math_delta');
         InputRegistry.setInputs(this.id, { input });
         this.output = new NumberSignal(this.id);
@@ -79,7 +79,7 @@ export class DivideBlock extends Component {
     public readonly output: NumberSignal;
     public readonly zeroDivisionOutput: BoolSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef) {
         super('math_divide');
         InputRegistry.setInputs(this.id, { a, b });
         this.output = new NumberSignal(this.id);
@@ -94,7 +94,7 @@ export class DivideBlock extends Component {
 export class EqualBlock extends Component {
     public readonly output: BoolSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal, epsilon: number) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef, epsilon: number) {
         super('math_equal');
         InputRegistry.setInputs(this.id, { a, b });
         this.properties.e = epsilon; //will be translated to <e text="0.01" value="0.01"/> (if epsilon is 0.01)
@@ -109,10 +109,10 @@ export class FxBlock extends Component {
     public readonly output: NumberSignal;
 
     constructor(
-        public readonly input: NumberSignal,
+        public readonly input: NumberSignalOrUndef,
         public readonly func: string
     ) {
-        super('math_fx');
+        super('math_function_1');
         InputRegistry.setInputs(this.id, { input });
         this.attributes.e = func;
         this.output = new NumberSignal(this.id);
@@ -126,12 +126,12 @@ export class FxyzBlock extends Component {
     public readonly output: NumberSignal;
 
     constructor(
-        public readonly x: NumberSignal,
-        public readonly y: NumberSignal,
-        public readonly z: NumberSignal,
+        public readonly x: NumberSignalOrUndef,
+        public readonly y: NumberSignalOrUndef,
+        public readonly z: NumberSignalOrUndef,
         public readonly func: string
     ) {
-        super('math_fxyz');
+        super('math_function_3');
         InputRegistry.setInputs(this.id, { x, y, z });
         this.attributes.e = func;
         this.output = new NumberSignal(this.id);
@@ -145,17 +145,17 @@ export class FxyzwabcdBlock extends Component {
     public readonly output: NumberSignal;
 
     constructor(
-        public readonly x: NumberSignal, 
-        public readonly y: NumberSignal, 
-        public readonly z: NumberSignal, 
-        public readonly w: NumberSignal,
-        public readonly a: NumberSignal,
-        public readonly b: NumberSignal,
-        public readonly c: NumberSignal,
-        public readonly d: NumberSignal,
+        public readonly x: NumberSignalOrUndef, 
+        public readonly y: NumberSignalOrUndef, 
+        public readonly z: NumberSignalOrUndef, 
+        public readonly w: NumberSignalOrUndef,
+        public readonly a: NumberSignalOrUndef,
+        public readonly b: NumberSignalOrUndef,
+        public readonly c: NumberSignalOrUndef,
+        public readonly d: NumberSignalOrUndef,
         public readonly func: string
     ) {
-        super('math_fxyzwabcd');
+        super('math_function_8');
         InputRegistry.setInputs(this.id, { x, y, z, w, a, b, c, d });
         this.attributes.e = func;
         this.output = new NumberSignal(this.id);
@@ -168,7 +168,7 @@ export class FxyzwabcdBlock extends Component {
 export class ModuloBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef) {
         super('math_modulo');
         InputRegistry.setInputs(this.id, { a, b });
         this.output = new NumberSignal(this.id);
@@ -181,7 +181,7 @@ export class ModuloBlock extends Component {
 export class MultiplyBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef) {
         super('math_multiply');
         InputRegistry.setInputs(this.id, { a, b });
         this.output = new NumberSignal(this.id);
@@ -194,7 +194,7 @@ export class MultiplyBlock extends Component {
 export class SubstractBlock extends Component {
     public readonly output: NumberSignal;
 
-    constructor(public readonly a: NumberSignal, public readonly b: NumberSignal) {
+    constructor(public readonly a: NumberSignalOrUndef, public readonly b: NumberSignalOrUndef) {
         super('math_subtract');
         InputRegistry.setInputs(this.id, { a, b });
         this.output = new NumberSignal(this.id);

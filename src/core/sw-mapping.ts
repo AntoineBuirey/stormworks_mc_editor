@@ -71,6 +71,8 @@ export const BLOCK_IDS = {
     'property_tooltip_bool': 44,
 };
 
+export type BlockName = keyof typeof BLOCK_IDS;
+
 export const NODE_TYPES : Record<NodeType, number> = {
     'Boolean': 0,
     'Number': 1,

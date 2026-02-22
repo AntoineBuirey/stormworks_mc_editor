@@ -28,7 +28,7 @@ export class BooleanFxyzwBlock extends Component {
         public readonly w: BoolSignal,
         public readonly func: string
     ) {
-        super('logic_fxyzw');
+        super('logic_bool_function_4');
         InputRegistry.setInputs(this.id, { x, y, z, w });
         this.attributes.e = func;
         this.output = new BoolSignal(this.id);
@@ -52,7 +52,7 @@ export class BooleanFxyzwabcdBlock extends Component {
         public readonly d: BoolSignal,
         public readonly func: string
     ) {
-        super('logic_fxyzwabcd');
+        super('logic_bool_function_8');
         InputRegistry.setInputs(this.id, { x, y, z, w, a, b, c, d });
         this.attributes.e = func;
         this.output = new BoolSignal(this.id);
@@ -66,7 +66,7 @@ export class ConstantOnSignalBlock extends Component {
     public readonly signal: BoolSignal;
 
     constructor() {
-        super('constant_on_signal');
+        super('constant_on');
          this.signal = new BoolSignal(this.id);
     }
 }
@@ -79,7 +79,7 @@ export class JKFlipFlopBlock extends Component {
     public readonly notoutput: BoolSignal;
     
     constructor(public readonly set: BoolSignal, public readonly reset: BoolSignal) {
-        super('logic_jk_flipflop');
+        super('logic_jk_flip_flop');
         InputRegistry.setInputs(this.id, { set, reset });
         this.output = new BoolSignal(this.id);
         this.notoutput = new BoolSignal(this.id);

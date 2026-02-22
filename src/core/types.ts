@@ -42,3 +42,12 @@ export class VideoSignal extends Signal<'Video'> {
     }
 }
 
+
+export type NumberSignalOrUndef = NumberSignal | undefined;
+export type BoolSignalOrUndef = BoolSignal | undefined;
+export type CompositeSignalOrUndef = CompositeSignal | undefined;
+export type AudioSignalOrUndef = AudioSignal | undefined;
+export type VideoSignalOrUndef = VideoSignal | undefined;
+
+export type AnySignal = NumberSignal | BoolSignal | CompositeSignal | AudioSignal | VideoSignal;
+export type AnySignalOrUndef = AnySignal | undefined;
