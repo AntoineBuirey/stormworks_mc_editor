@@ -2,20 +2,7 @@ import fs from 'fs';
 
 import { Component } from '../../core/component';
 import { NumberSignal, BoolSignal, CompositeSignal, VideoSignal, AudioSignal } from '../../core/types';
-import { InputRegistry } from '../../core/compiler-context';
 
-/**
- * Select between two audio inputs based on a switch signal.
- */
-export class AudioSwitchboxBlock extends Component {
-    public readonly output: AudioSignal;
-
-    constructor(public readonly onInput: AudioSignal, public readonly offInput: AudioSignal, public readonly switchSignal: BoolSignal) {
-        super('composite_audio_switchbox');
-        InputRegistry.setInputs(this.id, { onInput, offInput, switchSignal });
-        this.output = new AudioSignal(this.id);
-    }
-}
 
 /**
  * Convert a composite binary signal to a number using a custom function.
@@ -24,8 +11,7 @@ export class CompositeBinaryToNumberBlock extends Component {
     public readonly output: NumberSignal;
 
     constructor(public readonly input: CompositeSignal, public readonly func: string) {
-        super('composite_binary_to_number');
-        InputRegistry.setInputs(this.id, { input });
+        super(1, 'composite_binary_to_number', { input });
         this.attributes.e = func;
         this.output = new NumberSignal(this.id);
     }
@@ -37,15 +23,15 @@ export class CompositeBinaryToNumberBlock extends Component {
  */
 export class CompositeReadNumberBlock extends Component {
     public readonly output: NumberSignal;
+
     constructor( input: CompositeSignal, channel: number);
     constructor(input: CompositeSignal, channel: 'variable', startChannel: NumberSignal, );
     constructor(public readonly input: CompositeSignal, public readonly channel: number | 'variable', public readonly startChannel?: NumberSignal) {
-        super('composite_read_number');
+        const inputs = typeof channel === 'number' ? { input } : { input, startChannel: startChannel! };
+        super(1, 'composite_read_number', inputs);
         if (typeof channel === 'number') {
-            InputRegistry.setInputs(this.id, { input });
             this.attributes.i = channel;
         } else {
-            InputRegistry.setInputs(this.id, { input, startChannel: startChannel! });
             this.attributes.i = -1; // Use -1 to indicate variable channel mode
         }
         this.output = new NumberSignal(this.id);
@@ -62,28 +48,14 @@ export class CompositeReadOnOffBlock extends Component {
     constructor( input: CompositeSignal, channel: number);
     constructor(input: CompositeSignal, channel: 'variable', startChannel: NumberSignal);
     constructor(public readonly input: CompositeSignal, public readonly channel: number | 'variable', public readonly startChannel?: NumberSignal) {
-        super('composite_read_bool');
+        const inputs = typeof channel === 'number' ? { input } : { input, startChannel: startChannel! };
+        super(1, 'composite_read_bool', inputs);
         if (typeof channel === 'number') {
-            InputRegistry.setInputs(this.id, { input });
             this.attributes.i = channel;
         } else {
-            InputRegistry.setInputs(this.id, { input, startChannel: startChannel! });
             this.attributes.i = -1; // Use -1 to indicate variable channel mode
         }
         this.output = new BoolSignal(this.id);
-    }
-}
-
-/**
- * Select between two composite inputs based on a switch signal.
- */
-export class CompositeSwitchboxBlock extends Component {
-    public readonly output: CompositeSignal;
-
-    constructor(public readonly onInput: CompositeSignal, public readonly offInput: CompositeSignal, public readonly switchSignal: BoolSignal) {
-        super('composite_switchbox');
-        InputRegistry.setInputs(this.id, { onInput, offInput, switchSignal });
-        this.output = new CompositeSignal(this.id);
     }
 }
 
@@ -98,10 +70,9 @@ export class CompositeWriteNumberBlock extends Component {
     // the number of channels to write is determined by the channelCount parameter, which must be between 1 and 32 (inclusive).
     // there is also an optional startChannel parameter which specifies the first channel to write to (default is 1).
     // It can also be set to 'variable', in which case the start channel will be determined by the value of the startChannel signal.
-    constructor(input: CompositeSignal, channelCount: number,  startChannel: number, ...values: NumberSignal[]);
-    constructor(input: CompositeSignal, channelCount: number, startChannel: 'variable', startChannelSignal: NumberSignal, ...values: NumberSignal[]);
-    constructor(public readonly input: CompositeSignal, public readonly channelCount: number, public readonly startChannel: 'variable' | number, public readonly startChannelSignal?: NumberSignal, ... values: NumberSignal[]) {
-        super('composite_write_number');
+    constructor(input: CompositeSignal | undefined, channelCount: number,  startChannel: number, ...values: NumberSignal[]);
+    constructor(input: CompositeSignal | undefined, channelCount: number, startChannel: 'variable', startChannelSignal: NumberSignal, ...values: NumberSignal[]);
+    constructor(public readonly input: CompositeSignal | undefined, public readonly channelCount: number, public readonly startChannel: 'variable' | number, public readonly startChannelSignal?: NumberSignal, ... values: NumberSignal[]) {
         const inputsObject: Record<string, any> = { input };
         values.forEach((value, index) => {
             inputsObject[`value${index}`] = value;
@@ -109,7 +80,7 @@ export class CompositeWriteNumberBlock extends Component {
         if (startChannel === 'variable') {
             inputsObject['startChannel'] = startChannelSignal!;
         }
-        InputRegistry.setInputs(this.id, inputsObject);
+        super(1, 'composite_write_number', inputsObject);
         if (startChannel !== 'variable') {
             this.attributes.s = startChannel;
         }
@@ -130,10 +101,9 @@ export class CompositeWriteOnOffBlock extends Component {
     // there is also an optional startChannel parameter which specifies the first channel to write to (default is 1).
     // It can also be set to 'variable', in which case the start channel will be determined by the value of the startChannel signal.
 
-    constructor(input: CompositeSignal, channelCount: number, startChannel: number, startChannelSignal?: undefined, ...values: BoolSignal[]);
-    constructor(input: CompositeSignal, channelCount: number, startChannel: 'variable', startChannelSignal: NumberSignal, ...values: BoolSignal[]);
-    constructor(public readonly input: CompositeSignal, public readonly channelCount: number, public readonly startChannel: 'variable' | number, public readonly startChannelSignal?: NumberSignal, ... values: BoolSignal[]) {
-        super('composite_write_bool');
+    constructor(input: CompositeSignal | undefined, channelCount: number, startChannel: number, startChannelSignal?: undefined, ...values: BoolSignal[]);
+    constructor(input: CompositeSignal | undefined, channelCount: number, startChannel: 'variable', startChannelSignal: NumberSignal, ...values: BoolSignal[]);
+    constructor(public readonly input: CompositeSignal | undefined, public readonly channelCount: number, public readonly startChannel: 'variable' | number, public readonly startChannelSignal?: NumberSignal, ... values: BoolSignal[]) {
         const inputsObject: Record<string, any> = { input };
         values.forEach((value, index) => {
             inputsObject[`value${index}`] = value;
@@ -141,7 +111,7 @@ export class CompositeWriteOnOffBlock extends Component {
         if (startChannel === 'variable') {
             inputsObject['startChannel'] = startChannelSignal!;
         }
-        InputRegistry.setInputs(this.id, inputsObject);
+        super(1, 'composite_write_bool', inputsObject);
         if (startChannel !== 'variable') {
             this.attributes.s = startChannel;
         }
@@ -157,13 +127,12 @@ export class LuaScriptBlock extends Component {
     public readonly data: CompositeSignal;
     public readonly video: VideoSignal;
 
-    constructor(public readonly dataInput: CompositeSignal, public readonly videoInput: VideoSignal, public readonly fileScriptPath: string) {
-        super('composite_lua');
+    constructor(public readonly fileScriptPath: string, public readonly dataInput?: CompositeSignal, public readonly videoInput?: VideoSignal) {
+        super(2, 'composite_lua', { dataInput, videoInput });
 
         if (!fs.existsSync(fileScriptPath)) {
             throw new Error(`Lua script file not found at path: ${fileScriptPath}`);
         }
-        InputRegistry.setInputs(this.id, { dataInput, videoInput });
         this.attributes.script = fs.readFileSync(fileScriptPath, 'utf-8'); // Read the Lua script from the specified file path and store it in an attribute
         this.data = new CompositeSignal(this.id);
         this.video = new VideoSignal(this.id);
@@ -177,21 +146,7 @@ export class NumberToCompositeBinaryBlock extends Component {
     public readonly output: CompositeSignal;
     
     constructor(public readonly input: NumberSignal) {
-        super('composite_number_to_binary');
-        InputRegistry.setInputs(this.id, { input });
+        super(1, 'composite_number_to_binary', { input });
         this.output = new CompositeSignal(this.id);
-    }
-}
-
-/**
- * Select between two video inputs based on a switch signal.
- */
-export class VideoSwitchboxBlock extends Component {
-    public readonly output: VideoSignal;
-
-    constructor(public readonly onInput: VideoSignal, public readonly offInput: VideoSignal, public readonly switchSignal: BoolSignal) {
-        super('composite_video_switchbox');
-        InputRegistry.setInputs(this.id, { onInput, offInput, switchSignal });
-        this.output = new VideoSignal(this.id);
     }
 }

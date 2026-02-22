@@ -70,12 +70,11 @@ function loadModule(filePath: string) {
         const controller = new loaded[controller_name]();
         const description = controller.description;
         const size = controller.size;
-        setImmediate(() => {
-            console.log(`Module loaded: ${controller_name}`);
-            const xml = new Compiler(controller_name, description, size).compile();
-            fs.writeFileSync(outputFile, xml, "utf8");
-            console.log(`Generated ${outputFile}`);
-        });
+        
+        console.log(`Module loaded: ${controller_name}`);
+        const xml = new Compiler(controller_name, description, size).compile();
+        fs.writeFileSync(outputFile, xml, "utf8");
+        console.log(`Generated ${outputFile}`);
     } catch (err) {
         console.error("Error loading module:", err);
     }

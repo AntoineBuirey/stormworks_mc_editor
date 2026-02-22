@@ -1,6 +1,5 @@
 import { Component } from '../../core/component';
 import { NumberSignal, BoolSignal, NumberSignalOrUndef, BoolSignalOrUndef } from '../../core/types';
-import { InputRegistry } from '../../core/compiler-context';
 
 /**
  * Configurable dropdown property with custom options and values.
@@ -9,7 +8,7 @@ export class PropertyDropdownBlock extends Component {
     public readonly output: NumberSignal;
     
     constructor(public readonly name: string, public readonly options: { text: string, value: number }[], public readonly defaultValueIndex: number = 0) {
-        super('property_dropdown');
+        super(1, 'property_dropdown', {});
         this.attributes.name = name;
 
         this.properties.items = options.map((opt, index) => ({
@@ -28,7 +27,7 @@ export class PropertyNumberBlock extends Component {
     public readonly output: NumberSignal;
     
     constructor(public readonly name: string, public readonly defaultValue: number = 0) {
-        super('property_number');
+        super(1, 'property_number', {});
         this.attributes.n = name;
         this.properties.v = defaultValue; //will be translated to <value text="0" value="0"/> (if defaultValue is 0)
         this.output = new NumberSignal(this.id);
@@ -48,7 +47,7 @@ export class PropertySliderBlock extends Component {
         public readonly rounding: number,
         public readonly defaultValue: number = 0
     ) {
-        super('property_slider');
+        super(1, 'property_slider', {});
         this.attributes.name = name;
         this.properties.min = min; //will be translated to <min text="0" value="0"/> (if min is 0)
         this.properties.max = max; //will be translated to <max text="1" value="1"/> (if max is 1)
@@ -64,7 +63,7 @@ export class PropertySliderBlock extends Component {
 export class PropertyTextBlock extends Component {
 
     constructor(public readonly name: string, public readonly value: string) {
-        super('property_text');
+        super(1, 'property_text', {});
         this.attributes.n = name;
         this.attributes.v = value; //will be translated to <value text="default" value="default"/> (if value is "default")
     }
@@ -82,7 +81,7 @@ export class PropertyToggleBlock extends Component {
         public readonly offLabel: string,
         public readonly value: boolean = false
     ) {
-        super('property_toggle');
+        super(1, 'property_toggle', {});
         this.attributes.n = name;
         this.attributes.on = onLabel;
         this.attributes.off = offLabel;
@@ -109,10 +108,9 @@ export class TooltipNumberBlock extends Component {
         public readonly value: NumberSignalOrUndef,
         public readonly error: BoolSignalOrUndef
     ) {
-        super('property_tooltip_number');
+        super(0, 'property_tooltip_number', { value, error });
         this.attributes.l = name;
         this.attributes.m = this.displayModeMap[display];
-        InputRegistry.setInputs(this.id, { value, error });
     }
 }
 
@@ -134,11 +132,10 @@ export class TooltipOnOffBlock extends Component {
         public readonly display: 'Always' | 'If On' | 'if Off',
         public readonly value: BoolSignalOrUndef,
     ) {
-        super('property_tooltip_bool');
+        super(0, 'property_tooltip_bool', { value });
         this.attributes.l = name;
         this.attributes.on = onLabel;
         this.attributes.off = offLabel;
         this.attributes.m = this.displayModeMap[display];
-        InputRegistry.setInputs(this.id, { value });
     }
 }

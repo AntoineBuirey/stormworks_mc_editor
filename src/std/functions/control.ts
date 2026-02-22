@@ -31,10 +31,6 @@ export function NumericalJunction(value: NumberSignal, switchSignal: BoolSignal)
     return [block.onpath, block.offpath];
 }
 
-export function NumericalSwitchBox(onValue: NumberSignal, offValue: NumberSignal, switchSignal: BoolSignal): NumberSignal {
-    return new blocks.NumericalSwitchBoxBlock(onValue, offValue, switchSignal).output;
-}
-
 export function PIDController(
     setpoint: NumberSignal,
     processVariable: NumberSignal,

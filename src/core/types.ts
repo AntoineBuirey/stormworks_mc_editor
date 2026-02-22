@@ -49,5 +49,10 @@ export type CompositeSignalOrUndef = CompositeSignal | undefined;
 export type AudioSignalOrUndef = AudioSignal | undefined;
 export type VideoSignalOrUndef = VideoSignal | undefined;
 
-export type AnySignal = NumberSignal | BoolSignal | CompositeSignal | AudioSignal | VideoSignal;
-export type AnySignalOrUndef = AnySignal | undefined;
+export type AnySignalOrUndef = Signal<NodeType> | undefined;
+
+
+export type OneToEightArgs<T> = [T] | [T, T] | [T, T, T] | [T, T, T, T] | [T, T, T, T, T] | [T, T, T, T, T, T] | [T, T, T, T, T, T, T] | [T, T, T, T, T, T, T, T];
+
+export type HasSwitchBoxType = NumberSignal | CompositeSignal | VideoSignal | AudioSignal;
+export type CanBeInComposite = NumberSignal | BoolSignal;

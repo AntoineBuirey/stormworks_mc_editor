@@ -26,22 +26,28 @@ export function InputVideo(name: string, description : string = ""): VideoSignal
     return input.signal;
 }
 
-export function OutputBoolean(name: string, description : string = "", source: BoolSignal): void {
-    new blocks.OutputBoolean(name, description, source);
-}
 
-export function OutputNumber(name: string, description : string = "", source: NumberSignal): void {
-    new blocks.OutputNumber(name, description, source);
-}
-
-export function OutputComposite(name: string, description : string = "", source: CompositeSignal): void {
-    new blocks.OutputComposite(name, description, source);
-}
-
-export function OutputAudio(name: string, description : string = "", source: AudioSignal): void {
-    new blocks.OutputAudio(name, description, source);
-}
-
-export function OutputVideo(name: string, description : string = "", source: VideoSignal): void {
-    new blocks.OutputVideo(name, description, source);
+export function Output(name: string, description : string, source: NumberSignal): void;
+export function Output(name: string, description : string, source: BoolSignal): void;
+export function Output(name: string, description : string, source: CompositeSignal): void;
+export function Output(name: string, description : string, source: AudioSignal): void;
+export function Output(name: string, description : string, source: VideoSignal): void;
+export function Output(name: string, description : string = "", source: NumberSignal | BoolSignal | CompositeSignal | AudioSignal | VideoSignal): void {
+    switch (source.type) {
+        case 'Number':
+            new blocks.OutputNumber(name, description, source);
+            break;
+        case 'Boolean':
+            new blocks.OutputBoolean(name, description, source);
+            break;
+        case 'Composite':
+            new blocks.OutputComposite(name, description, source);
+            break;
+        case 'Audio':
+            new blocks.OutputAudio(name, description, source);
+            break;
+        case 'Video':
+            new blocks.OutputVideo(name, description, source);
+            break;
+    }
 }

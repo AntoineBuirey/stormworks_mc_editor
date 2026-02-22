@@ -1,5 +1,5 @@
 import * as blocks from "../blocks/arithmetic";
-import { NumberSignal, BoolSignal } from '../../core/types';
+import { NumberSignal, BoolSignal, OneToEightArgs } from '../../core/types';
 
 export function Abs(x: NumberSignal): NumberSignal {
     return new blocks.AbsBlock(x).output;
@@ -30,16 +30,15 @@ export function Equal(a: NumberSignal, b: NumberSignal, epsilon : number): BoolS
     return new blocks.EqualBlock(a, b, epsilon).output;
 }
 
-export function Fx(x: NumberSignal, func : string): NumberSignal {
-    return new blocks.FxBlock(x, func).output;
-}
 
-export function Fxyz(x: NumberSignal, y: NumberSignal, z: NumberSignal, func : string): NumberSignal {
-    return new blocks.FxyzBlock(x, y, z, func).output;
-}
-
-export function Fxyzwabcd(x: NumberSignal, y: NumberSignal, z: NumberSignal, w: NumberSignal, a: NumberSignal, b: NumberSignal, c: NumberSignal, d: NumberSignal, func : string): NumberSignal {
-    return new blocks.FxyzwabcdBlock(x, y, z, w, a, b, c, d, func).output;
+export function Function(inputs: OneToEightArgs<NumberSignal>, func: string): NumberSignal {
+    if (inputs.length == 1) {
+        return new blocks.FxBlock(...inputs as [NumberSignal], func).output;
+    } else if (inputs.length <= 3) {
+        return new blocks.FxyzBlock(...inputs as [NumberSignal, NumberSignal, NumberSignal], func).output;
+    } else {
+        return new blocks.FxyzwabcdBlock(...inputs as [NumberSignal, NumberSignal, NumberSignal, NumberSignal, NumberSignal, NumberSignal, NumberSignal, NumberSignal], func).output;
+    }
 }
 
 export function Modulo(a: NumberSignal, b: NumberSignal): NumberSignal {

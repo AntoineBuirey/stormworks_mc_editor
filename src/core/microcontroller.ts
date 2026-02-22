@@ -12,13 +12,9 @@ export abstract class MicroController {
         }
         MicroController.instance = this;
 
-        // Defer setup until after child class field initializers have run
-        // This ensures that properties like engineTemp are defined before setup() is called
-        setTimeout(() => {
-            // first, run the method defined by the user to set up the controller's components and logic
-            this.setup();
-            //then, register this instance in the compiler context so it can be compiled later
-        }, 0);
+        this.setup();
+
+        console.log("MicroController initialized.");
     }
 
     // This method should be implemented by the user to define their controller's components and logic
