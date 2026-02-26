@@ -17,19 +17,6 @@ const outputFile = path.resolve(args.output);
 const baseDir = path.dirname(inputFile);
 const temp_dir = path.join(baseDir, ".stormworks_mc_editor_temp");
 
-function findPackageRoot(startDir: string): string | null {
-    let current = startDir;
-    while (true) {
-        const candidate = path.join(current, "package.json");
-        if (fs.existsSync(candidate)) {
-            return current;
-        }
-        const parent = path.dirname(current);
-        if (parent === current) return null;
-        current = parent;
-    }
-}
-
 function compile(inputFile: string) : string {
     const source = fs.readFileSync(inputFile, "utf8");
     const result = ts.transpileModule(source, {
